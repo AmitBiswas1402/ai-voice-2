@@ -1,9 +1,9 @@
 "use client";
 
-import { cn, getSubjectColor } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
+import { cn, configureAssistant, getSubjectColor } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import soundwaves from "@/constants/soundwaves.json";
 
@@ -15,7 +15,7 @@ enum CallStatus {
 }
 
 const CompanionComponent = ({
-  companionId,
+//   companionId,
   subject,
   topic,
   name,
@@ -42,9 +42,12 @@ const CompanionComponent = ({
   }, [isSpeaking, lottieRef]);
 
   useEffect(() => {
-    const onCallStart = () => {};
+    const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
 
-    const onCallEnd = () => {};
+    const onCallEnd = () => {
+      setCallStatus(CallStatus.FINISHED);
+      // addToSessionHistory(companionId)
+    };
 
     const onMessage = (message: Message) => {
       if (message.type === "transcript" && message.transcriptType === "final") {
@@ -90,7 +93,8 @@ const CompanionComponent = ({
       serverMessages: [],
     };
 
-    // vapi.start(configureAssistant(voice, style), assistantOverrides)
+    // @ts-expect-error
+    vapi.start(configureAssistant(voice, style), assistantOverrides);
   };
 
   const handleDisconnect = () => {
@@ -208,9 +212,10 @@ const CompanionComponent = ({
           })}
         </div>
 
-        <div className="transcript-fade" />
+        {/* <div className="transcript-fade" /> */}
       </section>
     </section>
   );
 };
+
 export default CompanionComponent;
