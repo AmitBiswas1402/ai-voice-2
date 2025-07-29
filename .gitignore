@@ -1,0 +1,17 @@
+# Ignore build outputs
+.next/
+dist/
+build/
+
+# Ignore dependencies
+node_modules/
+
+# Ignore logs and temp files
+*.log
+npm-debug.log*
+
+# Ignore map files
+*.map
+
+# VS Code settings (optional)
+.vscode/
