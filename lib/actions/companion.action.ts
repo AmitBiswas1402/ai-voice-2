@@ -122,8 +122,8 @@ export const newCompanionPermissions = async () => {
     return true;
   } else if (has({ feature: "3_companion_limit" })) {
     limit = 3;
-  } else if (has({ feature: "10_companion_limit" })) {
-    limit = 10;
+  } else if (has({ feature: "30_companion_limit" })) {
+    limit = 30;
   }
 
   const { data, error } = await supabase
