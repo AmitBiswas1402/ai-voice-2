@@ -6,6 +6,7 @@ import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import soundwaves from "@/constants/soundwaves.json";
+import { addToSessionHistory } from "@/lib/actions/companion.action";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -15,7 +16,7 @@ enum CallStatus {
 }
 
 const CompanionComponent = ({
-//   companionId,
+  companionId,
   subject,
   topic,
   name,
@@ -46,7 +47,7 @@ const CompanionComponent = ({
 
     const onCallEnd = () => {
       setCallStatus(CallStatus.FINISHED);
-      // addToSessionHistory(companionId)
+      addToSessionHistory(companionId)
     };
 
     const onMessage = (message: Message) => {
@@ -76,7 +77,7 @@ const CompanionComponent = ({
       vapi.off("speech-start", onSpeechStart);
       vapi.off("speech-end", onSpeechEnd);
     };
-  }, []);
+  });
 
   const toggleMicrophone = () => {
     const isMuted = vapi.isMuted();
@@ -93,7 +94,7 @@ const CompanionComponent = ({
       serverMessages: [],
     };
 
-    // @ts-expect-error
+    // @ts-expect-error vapi.start may not have correct type for configureAssistant return value
     vapi.start(configureAssistant(voice, style), assistantOverrides);
   };
 
