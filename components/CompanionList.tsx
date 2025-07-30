@@ -9,6 +9,7 @@ import {
 import { cn, getSubjectColor } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { v4 as uuidv4 } from 'uuid';
 
 interface CompanionsListProps {
   title: string;
@@ -17,7 +18,6 @@ interface CompanionsListProps {
 }
 
 const CompanionList = ({
-  title,
   companions,
   classNames,
 }: CompanionsListProps) => {
@@ -34,7 +34,7 @@ const CompanionList = ({
         </TableHeader>
         <TableBody>
           {companions?.map(({ id, subject, name, topic, duration }) => (
-            <TableRow key={id}>
+            <TableRow key={uuidv4()}>
               <TableCell>
                 <Link href={`/companions/${id}`}>
                   <div className="flex items-center gap-2">

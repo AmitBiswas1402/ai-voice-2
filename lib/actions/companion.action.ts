@@ -2,6 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseClient } from "../supabase";
+import { revalidatePath } from "next/cache";
 
 export const createCompanion = async (formData: CreateCompanion) => {
   const { userId: author } = await auth();
@@ -73,7 +74,7 @@ export const addToSessionHistory = async (companionId: string) => {
   return data;
 };
 
-export const getRecentSessions = async (limit = 10) => {
+export const getRecentSessions = async (limit = 5) => {
   const supabase = createSupabaseClient();
   const { data, error } = await supabase
     .from("session_history")
@@ -140,4 +141,61 @@ export const newCompanionPermissions = async () => {
   } else {
     return true;
   }
+};
+
+export const addBookmark = async (companionId: string, path: string) => {
+  try {
+    const { userId } = await auth();
+    if (!userId) return;
+
+    const supabase = createSupabaseClient();
+    const { data, error } = await supabase.from("bookmarks").insert({
+      companion_id: companionId,
+      user_id: userId,
+    });
+
+    if (error) {
+      console.error("Supabase insert error:", error); // helpful logging
+      return null; // don't throw inside server component unless caught
+    }
+
+    revalidatePath(path);
+    return data;
+  } catch (err) {
+    console.error("addBookmark error:", err);
+    return null; // avoid throwing
+  }
+};
+
+export const removeBookmark = async(companionId: string, path: string) => {
+  const {userId} = await auth();
+  if (!userId) {
+    return;
+  }
+
+  const supabase = createSupabaseClient();
+  const {data, error} = await supabase
+    .from("bookmark")
+    .delete()
+    .eq("companion_id", companionId)
+    .eq("user_id", userId)
+  
+  if (error) {
+    throw new Error(error.message);
+  }
+  revalidatePath(path);
+  return data;
+}
+
+export const getBookmarkedCompanions = async (userId: string) => {
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase
+    .from("bookmarks")
+    .select(`companions:companion_id (*)`) // Notice the (*) to get all the companion data
+    .eq("user_id", userId);
+  if (error) {
+    throw new Error(error.message);
+  }
+  // We don't need the bookmarks data, so we return only the companions
+  return data.map(({ companions }) => companions);
 };
